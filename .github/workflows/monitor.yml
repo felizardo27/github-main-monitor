@@ -1,0 +1,46 @@
+name: Monitor main branch
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    environment: GITHUB_MONITOR
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Rodar verificação
+        env:
+          GITHUB_OWNER: ${{ secrets.OWNER }}
+          GITHUB_REPO: ${{ secrets.REPO }}
+          GITHUB_BRANCH: ${{ secrets.BRANCH }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: node scripts/check-commit.js
+
+      - name: Commitar state.json se mudou
+        run: |
+          if git diff --quiet state.json; then
+            echo "Nenhuma mudança no state.json"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add state.json
+            git commit -m "chore: update monitored commit state"
+            git push
+          fi
