@@ -17,15 +17,15 @@ jobs:
     environment: GITHUB_MONITOR
 
     steps:
-      - name: Checkout do repositório
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configurar Node
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Rodar verificação
+      - name: Run check
         env:
           GITHUB_OWNER: ${{ secrets.OWNER }}
           GITHUB_REPO: ${{ secrets.REPO }}
@@ -36,10 +36,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: node scripts/check-commit.js
 
-      - name: Commitar state.json se mudou
+      - name: Commit state.json if changed
         run: |
           if git diff --quiet state.json; then
-            echo "Nenhuma mudança no state.json"
+            echo "No changes in state.json"
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
