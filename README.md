@@ -6,7 +6,7 @@ The project is designed to run through GitHub Actions. It fetches the latest com
 
 ## How It Works
 
-1. The `.github/workflows/monitor.yml` workflow runs the check every 5 minutes.
+1. The `.github/workflows/monitor.yml` workflow runs the check every 30 minutes.
 2. The `scripts/check-commit.js` script calls the GitHub API to fetch the latest commit from the configured branch.
 3. The returned SHA is compared with the value stored in `state.json`.
 4. On the first run, the current SHA is saved without sending an email.
@@ -49,7 +49,7 @@ permissions:
 
 The workflow runs in three situations:
 
-- Every 5 minutes through cron.
+- Every 30 minutes through cron.
 - Manually through `workflow_dispatch`.
 - On pushes to the `master` branch of this repository.
 
@@ -61,7 +61,7 @@ on:
     branches:
       - master
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 ```
 
